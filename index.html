@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO Command LED</title>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- <script src="js/main.js"></script> -->
+    <style>
+      .LDRValue{
+        font-family: helvetica;
+        font-weight: 200;
+        font-size: 22px;
+      }
+    </style>
+  </head>
+  <body>
+
+
+
+
+    <div class='LDRValue'></div>
+    <div id = "p5sketch"></div>
+    <button class='boutonLed'>allume led</button>
+    <script src="jquery.min.js"></script>
+    <script src="p5.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // var socket = io();
+
+      var socket = io();
+      var ellipseDiameter = 0
+
+      $(function () {
+
+
+          let boutonLed = $(".boutonLed")
+          let isOpen = false
+
+          boutonLed.on("click", function(){
+            isOpen = !isOpen
+            socket.emit('allume led', isOpen)
+            console.log(isOpen)
+          })
+
+          socket.on('LDR', function(data) {
+            $(".LDRValue").html(data.value);
+            ellipseDiameter = data.value
+          });
+
+        });
+
+
+
+        var myp5 = new p5( function( sketch ) {
+
+          var x = 100;
+          var y = 100;
+
+          sketch.setup = function() {
+            sketch.createCanvas(600, 400);
+            //sketch.ellipseMode(sketch.CENTER)
+          };
+
+          sketch.draw = function() {
+            sketch.fill(255,255,255)
+            let diameter = sketch.map(ellipseDiameter, 500, 1024, 150, 400)
+            // console.log(diameter)
+            sketch.background(0);
+            sketch.text(ellipseDiameter, 20, 30)
+            sketch.ellipse(300, 200, diameter, diameter)
+
+            //sketch.rect(x,y,diameter,diameter);
+          };
+        }, 'p5sketch');
+
+
+    </script>
+  </body>
+</html>
